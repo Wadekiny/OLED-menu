@@ -1,0 +1,455 @@
+C51 COMPILER V9.56.0.0   MAIN                                                              05/20/2018 13:45:47 PAGE 1   
+
+
+C51 COMPILER V9.56.0.0, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN .\Objects\main.obj
+COMPILER INVOKED BY: D:\Keil_v5\C51\BIN\C51.EXE main.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\main
+                    -.lst) OBJECT(.\Objects\main.obj)
+
+line level    source
+
+   1          #include <STC12C5A60S2.h>
+   2          #include "oled.h"
+   3          #include "key.h"
+   4          #include "bmp.h"
+   5          #include "delay.h"
+   6          #include "ispiap.h"
+   7          #include "binary.h"
+   8          #include "init.h"
+   9          #define u8 unsigned char
+  10          #define u16 unsigned int
+  11          
+  12          enum main_catalog{LEFT,RIGHT,MODE,PID,MESSAGE,DESIGNED,};
+  13          enum mode_catalog{AUTO,MANUAL,};
+  14          enum pid_catalog{KP,KI,KD,};
+  15          
+  16          enum main_catalog main_first;
+  17          enum main_catalog main_pointer;
+  18          u8 main_pointer_y;
+  19          
+  20          enum mode_catalog mode_pointer;
+  21          u8 mode_pointer_y;
+  22          
+  23          enum pid_catalog pid_pointer;
+  24          u8 pid_pointer_y;
+  25          
+  26          u8 mode;
+  27          u8 p,i,d;
+  28          
+  29          void ChangeNum(u8 *number,u8 x, u8 y);                  //改变参数
+  30          void OpenShow();                                                                //开机动画
+  31          void ShowArrow(u8 catalog_pointer_y, u8 line);  //显示箭头
+  32          void MessageMenu();             //信息界面
+  33          void DesignedMenu();    //设计者界面
+  34          void PIDMenu();                 //pid界面
+  35          void ModeMenu();                //模式界面
+  36          void MainMenu();                //主界面
+  37          
+  38          void main()
+  39          {       
+  40   1              Init();
+  41   1              
+  42   1              OpenShow();
+  43   1              MainMenu();             
+  44   1              while (1);
+  45   1      }
+  46          
+  47          void OpenShow()
+  48          {
+  49   1              u8 i,j;
+  50   1              OLED_WR_Byte(0x2e,OLED_CMD);    //关闭滚动
+  51   1              Delay20us();
+  52   1              Delay100us();
+  53   1              Delay500us();
+  54   1              Delay1ms();
+C51 COMPILER V9.56.0.0   MAIN                                                              05/20/2018 13:45:47 PAGE 2   
+
+  55   1              Delay10ms();
+  56   1              DelayMs(1);
+  57   1              Delay1s();
+  58   1              for (i=0; i<60; i++)                    //关门
+  59   1              {
+  60   2                      OLED_Pane8_8(i,120-i,0,7,1);
+  61   2                      Delay10ms();
+  62   2              }
+  63   1              for (i=60; i>0; i--)                    //开门
+  64   1              {
+  65   2                      OLED_Pane8_8(i,120-i,0,7,0);
+  66   2                      Delay10ms();
+  67   2              }
+  68   1              OLED_DrawBMP(0,0,128,8,BMP1);
+*** WARNING C182 IN LINE 68 OF main.c: pointer to different objects
+  69   1              Delay1s();
+  70   1              Delay1s();
+  71   1              OLED_DrawBMP(0,0,128,8,BMP2);
+*** WARNING C182 IN LINE 71 OF main.c: pointer to different objects
+  72   1              Delay1s();
+  73   1              Delay1s();
+  74   1              OLED_DrawBMP(0,0,128,8,BMP3);
+*** WARNING C182 IN LINE 74 OF main.c: pointer to different objects
+  75   1              Delay1s();
+  76   1              Delay1s();
+  77   1              OLED_DrawBMP(0,0,128,8,BMP4);  
+*** WARNING C182 IN LINE 77 OF main.c: pointer to different objects
+  78   1              Delay1s();
+  79   1              Delay1s();
+  80   1      
+  81   1              
+  82   1              //网格
+  83   1              for (i=0; i<16; i++)    
+  84   1              {
+  85   2                      OLED_DrawCube(0,i,1,1);
+  86   2                      DelayMs(30);
+  87   2              }
+  88   1              Delay500ms();
+  89   1              for (j=0; j<32; j++)
+  90   1              {
+  91   2                      for (i=0; i<16; i++)
+  92   2                      {
+  93   3                              OLED_DrawCube(j,i,1,1);
+  94   3                      }
+  95   2                      DelayMs(30);
+  96   2              }
+  97   1              Delay500ms();
+  98   1      
+  99   1              //很菜的菜单 滚屏 反色
+ 100   1              OLED_Clear();
+ 101   1              OLED_ShowCHinese(0,0,1);
+ 102   1              OLED_ShowCHinese(20,0,2);
+ 103   1              OLED_ShowCHinese(40,0,3);
+ 104   1              OLED_ShowCHinese(60,0,4);
+ 105   1              OLED_ShowCHinese(80,0,5);
+ 106   1              OLED_ShowCHinese(0,3,6);
+ 107   1              OLED_ShowCHinese(20,3,7);
+ 108   1              OLED_ShowCHinese(40,3,8);
+ 109   1              OLED_ShowCHinese(60,3,9);
+ 110   1              OLED_ShowCHinese(80,3,10);
+ 111   1              OLED_ShowCHinese(100,3,11);
+ 112   1      
+C51 COMPILER V9.56.0.0   MAIN                                                              05/20/2018 13:45:47 PAGE 3   
+
+ 113   1              OLED_rolling_vtcandlev(0,7,1);
+ 114   1              while (KeyScan() == NONE)
+ 115   1              {
+ 116   2                      OLED_WR_Byte(0xa6,OLED_CMD);
+ 117   2                      Delay100ms();
+ 118   2                      OLED_WR_Byte(0xa7,OLED_CMD);
+ 119   2                      Delay100ms();
+ 120   2              }
+ 121   1              OLED_WR_Byte(0x2e,OLED_CMD);
+ 122   1              OLED_WR_Byte(0xa6,OLED_CMD);
+ 123   1      }
+ 124          
+ 125          void MainMenu()
+ 126          {
+ 127   1              u8 key_data;
+ 128   1              OLED_WR_Byte(0x2e,OLED_CMD);    //关闭滚动
+ 129   1              OLED_Clear();
+ 130   1              while (1)
+ 131   1              {
+ 132   2                      ShowArrow(main_pointer_y,4);
+ 133   2                      switch (main_first)
+ 134   2                      {
+ 135   3                              case LEFT:      OLED_ShowString(20,0,"LEFT    ");
+ 136   3                                                      OLED_ShowString(20,2,"RIGHT   ");
+ 137   3                                                      OLED_ShowString(20,4,"MODE    ");
+ 138   3                                                      OLED_ShowString(20,6,"PID     ");
+ 139   3                                                      break;
+ 140   3                              case RIGHT:     OLED_ShowString(20,0,"RIGHT   ");
+ 141   3                                                      OLED_ShowString(20,2,"MODE    ");
+ 142   3                                                      OLED_ShowString(20,4,"PID     ");
+ 143   3                                                      OLED_ShowString(20,6,"MESSAGE ");
+ 144   3                                                      break;
+ 145   3                              case MODE:      OLED_ShowString(20,0,"MODE    ");
+ 146   3                                                      OLED_ShowString(20,2,"PID     ");
+ 147   3                                                      OLED_ShowString(20,4,"MESSAGE ");
+ 148   3                                                      OLED_ShowString(20,6,"DESIGNED");
+ 149   3                                                      break;
+ 150   3                              default:        OLED_ShowString(20,0,"MODE     ");
+ 151   3                                                      OLED_ShowString(20,2,"PID      ");
+ 152   3                                                      OLED_ShowString(20,4,"MESSAGE  ");
+ 153   3                                                      OLED_ShowString(20,6,"DESIGNED ");
+ 154   3                                                      break;
+ 155   3                      }
+ 156   2                      
+ 157   2                      key_data = KeyScan();
+ 158   2                      if (key_data == DOWN)
+ 159   2                      {
+ 160   3                              if (main_pointer_y != 6)        
+ 161   3                              {
+ 162   4                                      main_pointer++;
+ 163   4                                      main_pointer_y += 2;
+ 164   4                              }
+ 165   3                              else if (main_pointer < DESIGNED)
+ 166   3                              {
+ 167   4                                      main_pointer++;
+ 168   4                                      main_first++;
+ 169   4                              }
+ 170   3                      }
+ 171   2                      else if (key_data == UP)
+ 172   2                      {
+ 173   3                              if (main_pointer_y != 0)
+ 174   3                              {
+C51 COMPILER V9.56.0.0   MAIN                                                              05/20/2018 13:45:47 PAGE 4   
+
+ 175   4                                      main_pointer--;
+ 176   4                                      main_pointer_y -= 2;
+ 177   4                                      
+ 178   4                              }
+ 179   3                              else if (main_pointer > LEFT)
+ 180   3                              {
+ 181   4                                      main_first--;
+ 182   4                                      main_pointer--;
+ 183   4                              }
+ 184   3                      }
+ 185   2                      else if (key_data == IN)
+ 186   2                      {
+ 187   3                              switch (main_pointer)
+ 188   3                              {
+ 189   4                                      case LEFT:              break;
+ 190   4                                      case RIGHT:             break;
+ 191   4                                      case MODE:              ModeMenu();break;
+ 192   4                                      case PID:               PIDMenu();break;
+ 193   4                                      case MESSAGE:   MessageMenu();break;
+ 194   4                                      case DESIGNED:  DesignedMenu();break;
+ 195   4                                      default :               break;
+ 196   4                              }
+ 197   3                      }       
+ 198   2              }       
+ 199   1      }
+ 200          
+ 201          void ModeMenu()
+ 202          {
+ 203   1              u8 key_data;
+ 204   1              OLED_WR_Byte(0x2e,OLED_CMD);    //关闭滚动
+ 205   1              OLED_Clear();
+ 206   1              while (1)
+ 207   1              {       
+ 208   2                      ShowArrow(mode_pointer_y,2);
+ 209   2                      OLED_ShowString(20,0,"AUTO    ");
+ 210   2                      OLED_ShowString(20,2,"MANUAL  ");
+ 211   2                      
+ 212   2                      if (mode == AUTO)
+ 213   2                      {
+ 214   3                              OLED_ShowChar(100,0,'N');
+ 215   3                              OLED_ShowChar(100,2,' ');
+ 216   3                      }
+ 217   2                      else if (mode == MANUAL)
+ 218   2                      {
+ 219   3                              OLED_ShowChar(100,0,' ');
+ 220   3                              OLED_ShowChar(100,2,'N');
+ 221   3                      }
+ 222   2                      
+ 223   2                      key_data = KeyScan();//¼ì²â¼üÅÌ
+ 224   2                      if (key_data == DOWN)
+ 225   2                      {
+ 226   3                              mode_pointer_y = 2;
+ 227   3                              mode_pointer = MANUAL;
+ 228   3                      }
+ 229   2                      else if (key_data == UP)
+ 230   2                      {
+ 231   3                              mode_pointer_y = 0;
+ 232   3                              mode_pointer = AUTO;
+ 233   3                      }
+ 234   2                      else if (key_data == IN)
+ 235   2                      {
+ 236   3                              if (mode_pointer == AUTO) mode = AUTO;
+C51 COMPILER V9.56.0.0   MAIN                                                              05/20/2018 13:45:47 PAGE 5   
+
+ 237   3                              else if (mode_pointer == MANUAL) mode = MANUAL;
+ 238   3                      }       
+ 239   2                      else if (key_data == OUT)
+ 240   2                      {
+ 241   3                              OLED_Clear();
+ 242   3                              return;
+ 243   3                      }
+ 244   2              }
+ 245   1      }
+ 246          
+ 247          void PIDMenu()
+ 248          {
+ 249   1              u8 key_data;
+ 250   1              OLED_Clear();
+ 251   1              OLED_WR_Byte(0x2e,OLED_CMD);    //关闭滚动
+ 252   1              OLED_DrawBMP(0,6,128,8,pidpid);
+*** WARNING C182 IN LINE 252 OF main.c: pointer to different objects
+ 253   1              OLED_rolling_vtcandlev(6,7,0);
+ 254   1              while (1)
+ 255   1              {
+ 256   2                      p = IapRead(0);
+ 257   2                      i = IapRead(1);
+ 258   2                      d = IapRead(2);
+ 259   2                      OLED_WR_Byte(0x2e,OLED_CMD);    //关闭滚动
+ 260   2                      ShowArrow(pid_pointer_y,3);
+ 261   2                      OLED_ShowString(20,0,"KP      ");
+ 262   2                      OLED_ShowString(20,2,"KI      ");
+ 263   2                      OLED_ShowString(20,4,"KD      ");
+ 264   2                      
+ 265   2                      OLED_ShowNum(80,0,p,3,16);
+ 266   2                      OLED_ShowNum(80,2,i,3,16);
+ 267   2                      OLED_ShowNum(80,4,d,3,16);
+ 268   2                      OLED_WR_Byte(0x2f,OLED_CMD);    //开启滚动
+ 269   2                      
+ 270   2                      while ((key_data=KeyScan()) == NONE);
+ 271   2                      if (key_data==DOWN && pid_pointer<KD)
+ 272   2                      {
+ 273   3                              pid_pointer++;
+ 274   3                              pid_pointer_y += 2;
+ 275   3                      }
+ 276   2                      else if (key_data == UP && pid_pointer>KP)
+ 277   2                      {
+ 278   3                              pid_pointer--;
+ 279   3                              pid_pointer_y -= 2;
+ 280   3                      }
+ 281   2                      else if (key_data == IN)
+ 282   2                      {
+ 283   3                              switch (pid_pointer)
+ 284   3                              {
+ 285   4                                      case KP:ChangeNum(&p,80,0);break;
+ 286   4                                      case KI:ChangeNum(&i,80,2);break;
+ 287   4                                      case KD:ChangeNum(&d,80,4);break;
+ 288   4                                      default:break;
+ 289   4                              }
+ 290   3                              IapEraseSector(0);
+ 291   3                              IapWrite(0,p);
+ 292   3                              IapWrite(1,i);
+ 293   3                              IapWrite(2,d);
+ 294   3                      }       
+ 295   2                      else if (key_data == OUT)
+ 296   2                      {
+ 297   3                              OLED_Clear();
+C51 COMPILER V9.56.0.0   MAIN                                                              05/20/2018 13:45:47 PAGE 6   
+
+ 298   3                              return;
+ 299   3                      }
+ 300   2              }
+ 301   1      }
+ 302          
+ 303          void MessageMenu()
+ 304          {
+ 305   1              u8 key_data;
+ 306   1              OLED_WR_Byte(0x2e,OLED_CMD);    //关闭滚动
+ 307   1              OLED_Clear();
+ 308   1              while (1)
+ 309   1              {
+ 310   2                      OLED_ShowString(0,0,"Wang Tianyong");
+ 311   2                      OLED_ShowString(0,2,"17061227");
+ 312   2                      OLED_ShowString(0,4,"QQ:1059152613");
+ 313   2                      OLED_ShowString(0,6,"Phone13777804491");
+ 314   2                      key_data = KeyScan();
+ 315   2                      if (key_data != NONE)
+ 316   2                      {
+ 317   3                              OLED_Clear();
+ 318   3                              break;
+ 319   3                      }
+ 320   2              }
+ 321   1      }
+ 322          void DesignedMenu()
+ 323          {
+ 324   1              u8 page = 0;
+ 325   1              u8 key_data;
+ 326   1              OLED_WR_Byte(0x2e,OLED_CMD);    //关闭滚动
+ 327   1              OLED_Clear();
+ 328   1              while (1)
+ 329   1              {       
+ 330   2                      OLED_ShowString(0,0-page, "Designed by Wang");
+ 331   2                      OLED_ShowString(0,2-page, "----------------");
+ 332   2                      OLED_ShowString(0,4-page, "-SPECIAL THANKS-");
+ 333   2                      OLED_ShowString(0,6-page, "You Jingyun     ");
+ 334   2                      OLED_ShowString(0,8-page, "Lin Kefan       ");
+ 335   2                      OLED_ShowString(0,10-page,"Hu Yizhou       ");
+ 336   2                      OLED_ShowString(0,12-page,"Wang Zhaohui    ");
+ 337   2                      OLED_ShowString(0,14-page,"Lin Chenxi     T");
+ 338   2                      OLED_ShowString(0,16-page,"Ma Zhongyang   T");
+ 339   2                      key_data = KeyScan();
+ 340   2                      if (key_data == UP)
+ 341   2                      {
+ 342   3                              if (page>0)
+ 343   3                                      page -= 2;
+ 344   3                      }
+ 345   2                      else if (key_data == DOWN)
+ 346   2                      {
+ 347   3                              if (page<10)
+ 348   3                                      page += 2;
+ 349   3                      }
+ 350   2                      else if (key_data != NONE)
+ 351   2                      {
+ 352   3                              OLED_Clear();
+ 353   3                              return;
+ 354   3                      }
+ 355   2              }
+ 356   1      }
+ 357          
+ 358          void ChangeNum(u8 *number,u8 x, u8 y)
+ 359          {
+C51 COMPILER V9.56.0.0   MAIN                                                              05/20/2018 13:45:47 PAGE 7   
+
+ 360   1              u8 key_change;
+ 361   1              u8 temp = 0;
+ 362   1              OLED_WR_Byte(0x2e,OLED_CMD);    //关闭滚动
+ 363   1              OLED_ShowChar(x-10,y,'*');
+ 364   1              OLED_WR_Byte(0x2f,OLED_CMD);    //开启滚动
+ 365   1              while (1)
+ 366   1              {
+ 367   2                      OLED_WR_Byte(0x2e,OLED_CMD);    //关闭滚动
+ 368   2                      OLED_ShowNum(x,y,temp,3,16);
+ 369   2                      OLED_WR_Byte(0x2f,OLED_CMD);    //开启滚动
+ 370   2                      
+ 371   2                      while ((key_change=KeyScan()) == NONE);
+ 372   2                      if (key_change < 10 && temp < 100)
+ 373   2                      {
+ 374   3                              if (temp*10 + key_change> 255) temp = 255;
+ 375   3                              else temp = temp*10 + key_change;
+ 376   3                      }
+ 377   2                      else if (key_change == DELETE)
+ 378   2                      {
+ 379   3                              temp /= 10;
+ 380   3                      }
+ 381   2                      else if (key_change == OK)
+ 382   2                      {
+ 383   3                              *number = temp;
+ 384   3                              OLED_WR_Byte(0x2e,OLED_CMD);    //关闭滚动
+ 385   3                              OLED_ShowChar(x-10,y,' ');
+ 386   3                              OLED_WR_Byte(0x2f,OLED_CMD);    //开启滚动
+ 387   3                              break;
+ 388   3                      }
+ 389   2                      else if (key_change == OUT)
+ 390   2                      {
+ 391   3                              OLED_WR_Byte(0x2e,OLED_CMD);    //关闭滚动
+ 392   3                              OLED_ShowChar(x-10,y,' ');
+ 393   3                              OLED_WR_Byte(0x2f,OLED_CMD);    //开启滚动
+ 394   3                              break;
+ 395   3                      }
+ 396   2              }
+ 397   1      }
+ 398          
+ 399          void ShowArrow(u8 catalog_pointer_y, u8 line)
+ 400          {
+ 401   1              u8 i,j;
+ 402   1              OLED_WR_Byte(0x2e,OLED_CMD);    //关闭滚动
+ 403   1              for (i=0; i<10; i++)
+ 404   1              {
+ 405   2                      for (j=0; j<line*2; j+=2)
+ 406   2                      {
+ 407   3                              if (j != catalog_pointer_y)
+ 408   3                                      OLED_ShowString(i,j," ");
+ 409   3                      }
+ 410   2              }
+ 411   1              OLED_ShowCHinese(0,catalog_pointer_y,0);
+ 412   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =   1860    ----
+   CONSTANT SIZE    =   4700    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     11      17
+   IDATA SIZE       =   ----    ----
+C51 COMPILER V9.56.0.0   MAIN                                                              05/20/2018 13:45:47 PAGE 8   
+
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  5 WARNING(S),  0 ERROR(S)

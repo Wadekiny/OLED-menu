@@ -1,0 +1,61 @@
+C51 COMPILER V9.56.0.0   INIT                                                              05/20/2018 13:18:05 PAGE 1   
+
+
+C51 COMPILER V9.56.0.0, COMPILATION OF MODULE INIT
+OBJECT MODULE PLACED IN .\Objects\init.obj
+COMPILER INVOKED BY: D:\Keil_v5\C51\BIN\C51.EXE init.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\init
+                    -.lst) OBJECT(.\Objects\init.obj)
+
+line level    source
+
+   1          #include "init.h"
+   2          #include "oled.h"
+   3          
+   4          enum main_catalog{LEFT,RIGHT,MODE,PID,MESSAGE,DESIGNED,};
+   5          enum mode_catalog{AUTO,MANUAL,};
+   6          enum pid_catalog{KP,KI,KD,};
+   7          
+   8          extern enum main_catalog main_first;
+   9          extern enum main_catalog main_pointer;
+  10          extern u8 main_pointer_y;
+  11          
+  12          extern enum mode_catalog mode_pointer;
+  13          extern u8 mode_pointer_y;
+  14          
+  15          extern enum pid_catalog pid_pointer;
+  16          extern u8 pid_pointer_y;
+  17          
+  18          extern u8 mode;
+  19          
+  20          void Init()
+  21          {
+  22   1              OLED_Display_Off();     
+  23   1              OLED_Display_On();
+  24   1              OLED_Init();    
+  25   1              OLED_Clear();
+  26   1              main_first = LEFT;
+  27   1              main_pointer = LEFT;
+  28   1              main_pointer_y = 0;
+  29   1              
+  30   1              mode_pointer = AUTO;
+  31   1              mode_pointer_y = 0;
+  32   1      
+  33   1              pid_pointer = KP;
+  34   1              pid_pointer_y = 0;
+  35   1              
+  36   1              mode = AUTO;
+  37   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     30    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

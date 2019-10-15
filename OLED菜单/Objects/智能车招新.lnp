@@ -1,0 +1,8 @@
+".\Objects\main.obj",
+".\Objects\oled.obj",
+".\Objects\key.obj",
+".\Objects\delay.obj",
+".\Objects\ispiap.obj",
+".\Objects\init.obj" 
+TO ".\Objects\智能车招新" 
+PRINT(".\Listings\智能车招新.m51") RAMSIZE(256) 

@@ -1,0 +1,107 @@
+C51 COMPILER V9.56.0.0   DELAY                                                             05/17/2018 09:53:07 PAGE 1   
+
+
+C51 COMPILER V9.56.0.0, COMPILATION OF MODULE DELAY
+OBJECT MODULE PLACED IN .\Objects\delay.obj
+COMPILER INVOKED BY: D:\Keil_v5\C51\BIN\C51.EXE delay.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\del
+                    -ay.lst) OBJECT(.\Objects\delay.obj)
+
+line level    source
+
+   1          #include "intrins.h"
+   2          #include "delay.h"      
+   3          //包含调用时间
+   4          //      #if FOCS == 11059200UL
+   5          
+   6          void Delay20us()
+   7          {
+   8   1          unsigned char a;
+   9   1          for(a=52;a>0;a--);
+  10   1          _nop_();  //if Keil,require use intrins.h
+  11   1      }
+  12          
+  13          void Delay100us()
+  14          {
+  15   1          unsigned char a,b;
+  16   1          for(b=78;b>0;b--)
+  17   1              for(a=2;a>0;a--);
+  18   1          _nop_();  //if Keil,require use intrins.h
+  19   1      }
+  20          
+  21          void Delay500us()
+  22          {
+  23   1          unsigned char a,b;
+  24   1          for(b=14;b>0;b--)
+  25   1              for(a=97;a>0;a--);
+  26   1          _nop_();  //if Keil,require use intrins.h
+  27   1      }
+  28          
+  29          void Delay1ms()
+  30          {
+  31   1          unsigned char a,b;
+  32   1              for(b=21;b>0;b--)
+  33   1                  for(a=130;a>0;a--);
+  34   1              _nop_();  //if Keil,require use intrins.h
+  35   1      }
+  36          void Delay10ms()
+  37          {
+  38   1          unsigned char a,b;
+  39   1          for(b=194;b>0;b--)
+  40   1              for(a=141;a>0;a--);
+  41   1      }
+  42          
+  43          void Delay100ms()
+  44          {
+  45   1          unsigned char a,b,c;
+  46   1          for(c=157;c>0;c--)
+  47   1              for(b=207;b>0;b--)
+  48   1                  for(a=7;a>0;a--);
+  49   1      }
+  50          void Delay500ms()
+  51          {
+  52   1          unsigned char a,b,c;
+  53   1          for(c=246;c>0;c--)
+  54   1              for(b=212;b>0;b--)
+C51 COMPILER V9.56.0.0   DELAY                                                             05/17/2018 09:53:07 PAGE 2   
+
+  55   1                  for(a=25;a>0;a--);
+  56   1      }
+  57          
+  58          void Delay1s()
+  59          {
+  60   1          unsigned char a,b,c;
+  61   1          for(c=217;c>0;c--)
+  62   1              for(b=171;b>0;b--)
+  63   1                  for(a=73;a>0;a--);
+  64   1      }
+  65          
+  66          void DelayMs(unsigned int n)
+  67          {
+  68   1              unsigned char i, j;
+  69   1              for(n;n>0;n--)
+  70   1              {
+  71   2      
+  72   2                      _nop_();
+  73   2                      i = 11;
+  74   2                      j = 190;
+  75   2                      do
+  76   2                      {
+  77   3                              while (--j);
+  78   3                      } 
+  79   2                      while (--i);
+  80   2              }
+  81   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    110    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

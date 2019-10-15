@@ -1,0 +1,81 @@
+C51 COMPILER V9.56.0.0   ISPIAP                                                            05/17/2018 22:54:02 PAGE 1   
+
+
+C51 COMPILER V9.56.0.0, COMPILATION OF MODULE ISPIAP
+OBJECT MODULE PLACED IN .\Objects\ispiap.obj
+COMPILER INVOKED BY: D:\Keil_v5\C51\BIN\C51.EXE ispiap.c OPTIMIZE(8,SPEED) BROWSE DEBUG OBJECTEXTEND PRINT(.\Listings\is
+                    -piap.lst) OBJECT(.\Objects\ispiap.obj)
+
+line level    source
+
+   1          #include <STC12C5A60S2.h>
+   2          #include "ispiap.h"
+   3          #include <intrins.h>
+   4          
+   5          void IapIdle()  //不使用IAP
+   6          {
+   7   1              IAP_CONTR = 0;
+   8   1              IAP_CMD = 0;
+   9   1              IAP_TRIG = 0;
+  10   1              IAP_ADDRH = 0X80;
+  11   1              IAP_ADDRL = 0;
+  12   1      }
+  13          
+  14          
+  15          unsigned char IapRead(unsigned int addr)        //从IAP中读取
+  16          {
+  17   1              unsigned char dat;
+  18   1              IAP_CONTR = ENABLE_IAP;
+  19   1              IAP_CMD = CMD_READ;
+  20   1              IAP_ADDRL = addr;
+  21   1              IAP_ADDRH = addr >> 8;
+  22   1              IAP_TRIG = 0X5A;
+  23   1              IAP_TRIG = 0XA5;
+  24   1              _nop_();
+  25   1              dat = IAP_DATA;
+  26   1              IapIdle();
+  27   1              return dat;
+  28   1      }
+  29          
+  30          void IapWrite(unsigned int addr,unsigned char dat)      //写入IAP
+  31          {
+  32   1              IAP_CONTR = ENABLE_IAP;
+  33   1              IAP_CMD = CMD_PROGRAM;
+  34   1              IAP_ADDRL = addr;
+  35   1              IAP_ADDRH = addr >> 8;
+  36   1              IAP_DATA = dat;
+  37   1              IAP_TRIG = 0X5A;
+  38   1              IAP_TRIG = 0XA5;
+  39   1              _nop_();
+  40   1      
+  41   1              IapIdle();
+  42   1      }
+  43          
+  44          void IapEraseSector(unsigned int addr)  //擦除扇区
+  45          {
+  46   1              IAP_CONTR = ENABLE_IAP;
+  47   1              IAP_CMD = CMD_ERASE;
+  48   1              IAP_ADDRL = addr;
+  49   1              IAP_ADDRH = addr >> 8;
+  50   1              IAP_TRIG = 0X5A;
+  51   1              IAP_TRIG = 0XA5;
+  52   1              _nop_();
+  53   1      
+  54   1              IapIdle();
+C51 COMPILER V9.56.0.0   ISPIAP                                                            05/17/2018 22:54:02 PAGE 2   
+
+  55   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =     78    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =   ----    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
